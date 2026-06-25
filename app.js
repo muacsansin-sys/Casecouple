@@ -260,6 +260,7 @@ async function initFirebase() {
     const auth = authModule.getAuth(app);
     const db = storeModule.getFirestore(app);
     state.firebase = { auth, ...authModule, db, ...storeModule };
+    await state.firebase.setPersistence(auth, state.firebase.browserLocalPersistence);
     state.firebase.onAuthStateChanged(auth, handleAuthState);
     showAuthMessage(`Firebase 연결 완료. Google 로그인을 눌러주세요. ${currentDomainHint()}`);
     const redirectResult = await state.firebase.getRedirectResult(auth);
@@ -285,10 +286,21 @@ async function signInWithGoogle() {
   }
   const provider = new state.firebase.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: "select_account" });
-  showAuthMessage("Google 로그인 페이지로 이동 중이에요...");
+  showAuthMessage("Google 로그인을 진행 중이에요...");
   try {
-    await state.firebase.signInWithRedirect(state.firebase.auth, provider);
+    const result = await state.firebase.signInWithPopup(state.firebase.auth, provider);
+    const user = result?.user || state.firebase.auth.currentUser;
+    if (user) {
+      await handleAuthState(user);
+      return;
+    }
+    showAuthMessage(`로그인은 완료됐지만 사용자 정보를 받지 못했어요. ${currentDomainHint()}`);
   } catch (error) {
+    if (error.code === "auth/popup-blocked") {
+      showAuthMessage("팝업이 차단돼서 Google 로그인 페이지로 이동할게요.");
+      await state.firebase.signInWithRedirect(state.firebase.auth, provider);
+      return;
+    }
     console.error(error);
     showAuthMessage(`로그인 오류: ${error.code || error.message}. ${currentDomainHint()}`);
     setGate(true, false);
