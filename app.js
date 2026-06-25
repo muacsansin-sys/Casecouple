@@ -68,17 +68,22 @@ function renderAnniversaries() { const currentDay = daysBetween(state.startDate,
 async function saveGameResult() { state.completedGame = true; state.loveTemp = Math.min(100, state.loveTemp + 1); localStorage.setItem("lovebase.completedGame", todayKey()); localStorage.setItem("lovebase.loveTemp", state.loveTemp); await saveDailyPlay({ type: "game", gameId: getTodayGame().id, choice: state.selectedChoice }); renderDashboard(); alert(t("completedToast")); }
 async function initFirebase() {
   if (!state.firebaseReady) return;
-  const [{ initializeApp }, { getAuth, signInAnonymously, onAuthStateChanged }, { getFirestore, doc, setDoc, serverTimestamp }] = await Promise.all([
-    import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"),
-    import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"),
-    import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js")
-  ]);
-  const app = initializeApp(window.LOVEBASE_FIREBASE_CONFIG);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  state.firebase = { db, doc, setDoc, serverTimestamp };
-  onAuthStateChanged(auth, (user) => { state.user = user; });
-  await signInAnonymously(auth);
+  try {
+    const [{ initializeApp }, { getAuth, signInAnonymously, onAuthStateChanged }, { getFirestore, doc, setDoc, serverTimestamp }] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js")
+    ]);
+    const app = initializeApp(window.LOVEBASE_FIREBASE_CONFIG);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    state.firebase = { db, doc, setDoc, serverTimestamp };
+    onAuthStateChanged(auth, (user) => { state.user = user; });
+    await signInAnonymously(auth);
+  } catch (error) {
+    state.firebaseReady = false;
+    console.warn("Firebase local fallback:", error);
+  }
 }
 
 async function saveDailyPlay(payload) {
@@ -101,4 +106,5 @@ async function saveDailyPlay(payload) {
 function switchTab(tab) { document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === `view-${tab}`)); document.querySelectorAll(".nav-item").forEach((item) => item.classList.toggle("active", item.dataset.tab === tab)); window.scrollTo({ top: 0, behavior: "smooth" }); }
 async function boot() { await initFirebase(); document.getElementById("startDateInput").value = state.startDate; document.querySelectorAll(".language-toggle button").forEach((button) => button.addEventListener("click", () => { state.lang = button.dataset.lang; localStorage.setItem("lovebase.lang", state.lang); renderI18n(); renderDashboard(); })); document.querySelectorAll("[data-tab], [data-tab-target]").forEach((button) => button.addEventListener("click", () => switchTab(button.dataset.tab || button.dataset.tabTarget))); document.getElementById("startTodayButton").addEventListener("click", () => switchTab("game")); document.getElementById("saveWordsButton").addEventListener("click", async () => { state.completedWords = true; state.loveTemp = Math.min(100, state.loveTemp + 1); localStorage.setItem("lovebase.completedWords", todayKey()); localStorage.setItem("lovebase.loveTemp", state.loveTemp); await saveDailyPlay({ type: "words", message: document.getElementById("wordMessageInput").value }); alert(t("completedToast")); renderDashboard(); }); document.getElementById("saveStartDateButton").addEventListener("click", () => { const value = document.getElementById("startDateInput").value; if (!value) return; state.startDate = value; localStorage.setItem("lovebase.startDate", value); renderDashboard(); }); renderI18n(); renderDashboard(); }
 boot();
+
 
