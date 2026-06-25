@@ -257,9 +257,14 @@ async function initFirebase() {
     const db = storeModule.getFirestore(app);
     state.firebase = { auth, ...authModule, db, ...storeModule };
     state.firebase.onAuthStateChanged(auth, handleAuthState);
+    showAuthMessage("Firebase 연결 완료. Google 로그인을 눌러주세요.");
     const redirectResult = await state.firebase.getRedirectResult(auth);
     if (redirectResult?.user) {
       await handleAuthState(redirectResult.user);
+      return;
+    }
+    if (auth.currentUser) {
+      await handleAuthState(auth.currentUser);
     }
   } catch (error) {
     state.firebaseReady = false;
@@ -276,17 +281,10 @@ async function signInWithGoogle() {
   }
   const provider = new state.firebase.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: "select_account" });
-  showAuthMessage("Google 로그인을 진행 중이에요...");
+  showAuthMessage("Google 로그인 페이지로 이동 중이에요...");
   try {
-    const result = await state.firebase.signInWithPopup(state.firebase.auth, provider);
-    if (result?.user) {
-      await handleAuthState(result.user);
-    }
+    await state.firebase.signInWithRedirect(state.firebase.auth, provider);
   } catch (error) {
-    if (error.code === "auth/popup-blocked") {
-      await state.firebase.signInWithRedirect(state.firebase.auth, provider);
-      return;
-    }
     console.error(error);
     showAuthMessage(`로그인 오류: ${error.code || error.message}`);
     setGate(true, false);
