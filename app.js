@@ -189,6 +189,7 @@ function renderDashboard() {
   const next = getNextAnniversary();
   const game = getTodayGame();
   const pack = getTodayWordPack();
+  const connected = isConnected();
   document.getElementById("dayCount").textContent = day;
   document.getElementById("streakCount").textContent = state.streak;
   document.getElementById("loveTemp").textContent = state.loveTemp;
@@ -201,12 +202,18 @@ function renderDashboard() {
   document.getElementById("wordPracticeTheme").textContent = localText(pack.theme);
   document.getElementById("myGameStatus").textContent = state.completedGame ? t("done") : t("play");
   document.getElementById("myGameStatus").classList.toggle("done", state.completedGame);
+  document.getElementById("partnerGameStatus").textContent = connected ? t("partnerWaiting") : "상대 수락 대기중";
+  document.getElementById("startTodayButton").textContent = connected ? t("startToday") : "초대 링크 보기";
   renderWords("todayWordPreview", pack.words.slice(0, 3));
   renderWords("wordPracticeList", pack.words);
   renderMemories();
   renderGame();
   renderGameList();
   renderAnniversaries();
+}
+
+function isConnected() {
+  return Boolean(state.couple?.memberIds?.length >= 2);
 }
 
 function renderWords(targetId, words) {
@@ -360,7 +367,8 @@ async function loadCouple(coupleId) {
   document.getElementById("startDateInput").value = state.startDate;
   if ((state.couple.memberIds || []).length < 2) {
     renderCoupleGate();
-    setGate(false, true);
+    setGate(false, false);
+    renderDashboard();
     return;
   }
   setGate(false, false);
@@ -383,6 +391,7 @@ async function createInvite() {
   });
   await setDoc(doc(db, "users", state.user.uid), { coupleId: coupleRef.id, ...memberProfile(state.user), updatedAt: serverTimestamp() }, { merge: true });
   await loadCouple(coupleRef.id);
+  switchTab("today");
 }
 
 async function acceptInvite(coupleId) {
@@ -409,6 +418,11 @@ async function acceptInvite(coupleId) {
 }
 
 async function saveGameResult() {
+  if (!isConnected()) {
+    renderCoupleGate();
+    setGate(false, true);
+    return;
+  }
   state.completedGame = true;
   state.loveTemp = Math.min(100, state.loveTemp + 1);
   localStorage.setItem("lovebase.completedGame", todayKey());
@@ -468,9 +482,20 @@ async function boot() {
     renderDashboard();
   }));
   document.querySelectorAll("[data-tab], [data-tab-target]").forEach((button) => button.addEventListener("click", () => switchTab(button.dataset.tab || button.dataset.tabTarget)));
-  document.getElementById("startTodayButton").addEventListener("click", () => switchTab("game"));
+  document.getElementById("startTodayButton").addEventListener("click", () => {
+    if (!isConnected()) {
+      renderCoupleGate();
+      setGate(false, true);
+      return;
+    }
+    switchTab("game");
+  });
   document.getElementById("googleLoginButton").addEventListener("click", signInWithGoogle);
   document.getElementById("createInviteButton").addEventListener("click", createInvite);
+  document.getElementById("showInviteButton").addEventListener("click", () => {
+    renderCoupleGate();
+    setGate(false, true);
+  });
   document.getElementById("signOutButton").addEventListener("click", () => state.firebase.signOut(state.firebase.auth));
   document.getElementById("leaveCoupleButton").addEventListener("click", leaveCouple);
   document.getElementById("copyInviteButton").addEventListener("click", async () => {
@@ -478,6 +503,11 @@ async function boot() {
     alert("초대 링크를 복사했어요.");
   });
   document.getElementById("saveWordsButton").addEventListener("click", async () => {
+    if (!isConnected()) {
+      renderCoupleGate();
+      setGate(false, true);
+      return;
+    }
     state.completedWords = true;
     state.loveTemp = Math.min(100, state.loveTemp + 1);
     localStorage.setItem("lovebase.completedWords", todayKey());
