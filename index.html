@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fff1f6">
+  <title>Love Base</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="icon-button" type="button" aria-label="profile">LB</button>
+      <div class="brand"><strong>Love Base</strong><span data-i18n="tagline">Seoul to Bangkok</span></div>
+      <div class="language-toggle" aria-label="language"><button class="active" data-lang="ko" type="button">KO</button><button data-lang="th" type="button">TH</button></div>
+    </header>
+
+    <main>
+      <section class="view active" id="view-today">
+        <article class="hero-panel">
+          <div class="hero-actions"><span class="glass-pill" id="nextAnniversaryBadge">D-0</span><span class="glass-pill"><span id="streakCount">0</span><span data-i18n="streakDays">일 연속</span></span></div>
+          <div class="day-block"><span id="dayCount">0</span><small data-i18n="daysTogether">일째</small></div>
+          <div class="hero-bottom"><p data-i18n="heroCopy">오늘도 둘의 기록이 이어지는 중</p><button class="primary-button" id="startTodayButton" type="button" data-i18n="startToday">오늘 시작</button></div>
+        </article>
+
+        <section class="section">
+          <div class="section-title-row"><h2 data-i18n="todayRoutine">오늘의 루틴</h2><button class="text-button" type="button" data-tab-target="game" data-i18n="seeAll">전체 보기</button></div>
+          <div class="card-grid">
+            <article class="card accent-card wide"><span class="eyebrow" data-i18n="todayGame">오늘의 게임</span><h3 id="todayGameTitle">-</h3><p id="todayGameDescription">-</p><div class="status-row"><span class="status-chip done" id="myGameStatus">-</span><span class="status-chip" id="partnerGameStatus" data-i18n="partnerWaiting">상대 기다림</span></div></article>
+            <article class="card"><span class="eyebrow" data-i18n="loveTemp">커플 온도</span><h3><span id="loveTemp">84</span>°</h3><div class="meter" aria-hidden="true"><span style="height:52%"></span><span style="height:72%"></span><span style="height:44%"></span><span style="height:86%"></span><span style="height:94%"></span></div></article>
+            <article class="card"><span class="eyebrow" data-i18n="nextAnniversary">다음 기념일</span><h3 id="nextAnniversaryTitle">-</h3><p id="nextAnniversaryDate">-</p></article>
+          </div>
+        </section>
+
+        <section class="section"><div class="section-title-row"><h2 data-i18n="todayWords">오늘의 단어</h2><button class="text-button" type="button" data-tab-target="words" data-i18n="practice">외우기</button></div><article class="card wide"><span class="eyebrow" id="wordPackTheme">-</span><div class="word-list" id="todayWordPreview"></div></article></section>
+        <section class="section"><div class="section-title-row"><h2 data-i18n="memoryTitle">기념일 기록</h2><button class="text-button" type="button" data-tab-target="records" data-i18n="add">추가</button></div><div class="memory-list" id="memoryPreview"></div></section>
+      </section>
+
+      <section class="view" id="view-game"><div class="page-head"><h1 data-i18n="gamePage">게임</h1><p data-i18n="gamePageCopy">매일 하나씩 열리는 커플 미니게임</p></div><article class="card play-card" id="gamePlayCard"></article><div class="mini-game-list" id="miniGameList"></div></section>
+      <section class="view" id="view-words"><div class="page-head"><h1 data-i18n="wordPage">단어</h1><p data-i18n="wordPageCopy">서로의 언어로 마음을 전하는 연습</p></div><article class="card word-practice"><span class="eyebrow" id="wordPracticeTheme">-</span><div id="wordPracticeList"></div><label class="message-box"><span data-i18n="wordMessage">오늘 배운 말로 한마디</span><textarea id="wordMessageInput" rows="3" placeholder="คิดถึงนะ"></textarea></label><button class="primary-button full" id="saveWordsButton" type="button" data-i18n="saveWords">단어 완료</button></article></section>
+      <section class="view" id="view-records"><div class="page-head"><h1 data-i18n="recordsPage">기록</h1><p data-i18n="recordsPageCopy">사진, 메모, 기념일을 한 곳에</p></div><article class="card setup-card"><span class="eyebrow" data-i18n="coupleSettings">커플 설정</span><label><span data-i18n="startDate">사귄 날짜</span><input id="startDateInput" type="date"></label><button class="secondary-button full" id="saveStartDateButton" type="button" data-i18n="save">저장</button></article><div class="anniversary-list" id="anniversaryList"></div></section>
+      <section class="view" id="view-us"><div class="page-head"><h1 data-i18n="usPage">우리</h1><p data-i18n="usPageCopy">둘만의 기본 정보와 Firebase 연결 준비</p></div><article class="card setup-card"><span class="eyebrow">Firebase</span><p data-i18n="firebaseCopy">firebase-config.js에 프로젝트 설정값을 넣으면 연결됩니다.</p><pre><code>window.LOVEBASE_FIREBASE_CONFIG = { ... };</code></pre></article><article class="card setup-card"><span class="eyebrow" data-i18n="designNote">디자인 노트</span><p data-i18n="designCopy">큰 터치 영역, 짧은 문구, 은은한 빛으로 매일 열고 싶은 느낌을 만들었어요.</p></article></section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="main navigation"><button class="nav-item active" data-tab="today" type="button"><span>⌂</span><small data-i18n="navToday">오늘</small></button><button class="nav-item" data-tab="game" type="button"><span>♡</span><small data-i18n="navGame">게임</small></button><button class="nav-item" data-tab="words" type="button"><span>Aa</span><small data-i18n="navWords">단어</small></button><button class="nav-item" data-tab="records" type="button"><span>□</span><small data-i18n="navRecords">기록</small></button><button class="nav-item" data-tab="us" type="button"><span>◦</span><small data-i18n="navUs">우리</small></button></nav>
+  </div>
+
+  <script src="./firebase-config.example.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

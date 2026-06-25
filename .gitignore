@@ -1,0 +1,10 @@
+﻿# Local Firebase config
+firebase-config.js
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Logs
+*.log
