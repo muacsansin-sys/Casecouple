@@ -171,6 +171,10 @@ function setGate(authVisible, coupleVisible) {
   document.getElementById("coupleGate").classList.toggle("active", coupleVisible);
 }
 
+function showAuthMessage(message) {
+  document.getElementById("authNote").textContent = message;
+}
+
 function renderI18n() {
   document.querySelectorAll("[data-i18n]").forEach((node) => { node.textContent = t(node.dataset.i18n); });
   document.querySelectorAll(".language-toggle button").forEach((button) => button.classList.toggle("active", button.dataset.lang === state.lang));
@@ -253,24 +257,39 @@ async function initFirebase() {
     const db = storeModule.getFirestore(app);
     state.firebase = { auth, ...authModule, db, ...storeModule };
     state.firebase.onAuthStateChanged(auth, handleAuthState);
+    const redirectResult = await state.firebase.getRedirectResult(auth);
+    if (redirectResult?.user) {
+      await handleAuthState(redirectResult.user);
+    }
   } catch (error) {
     state.firebaseReady = false;
     console.warn("Firebase local fallback:", error);
+    showAuthMessage(`Firebase 초기화 오류: ${error.code || error.message}`);
     setGate(true, false);
   }
 }
 
 async function signInWithGoogle() {
+  if (!state.firebase?.auth) {
+    showAuthMessage("Firebase가 아직 준비되지 않았어요. 잠시 후 다시 눌러주세요.");
+    return;
+  }
   const provider = new state.firebase.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: "select_account" });
+  showAuthMessage("Google 로그인을 진행 중이에요...");
   try {
-    await state.firebase.signInWithPopup(state.firebase.auth, provider);
+    const result = await state.firebase.signInWithPopup(state.firebase.auth, provider);
+    if (result?.user) {
+      await handleAuthState(result.user);
+    }
   } catch (error) {
-    if (error.code === "auth/popup-blocked" || error.code === "auth/popup-closed-by-user") {
+    if (error.code === "auth/popup-blocked") {
       await state.firebase.signInWithRedirect(state.firebase.auth, provider);
       return;
     }
-    throw error;
+    console.error(error);
+    showAuthMessage(`로그인 오류: ${error.code || error.message}`);
+    setGate(true, false);
   }
 }
 
@@ -282,7 +301,14 @@ async function handleAuthState(user) {
   }
   document.getElementById("profileButton").textContent = (user.displayName || user.email || "LB").slice(0, 2).toUpperCase();
   setGate(false, false);
-  await loadCoupleForUser();
+  try {
+    await loadCoupleForUser();
+  } catch (error) {
+    console.error(error);
+    renderCoupleGate();
+    setGate(false, true);
+    document.getElementById("coupleGateNote").textContent = `로그인은 됐지만 커플 정보를 불러오지 못했어요: ${error.code || error.message}`;
+  }
 }
 
 async function loadCoupleForUser() {
