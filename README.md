@@ -37,3 +37,16 @@ git branch -M main
 git remote add origin <YOUR_GITHUB_REPO_URL>
 git push -u origin main
 ```
+
+## Vercel
+
+배포 주소: https://casecouple.vercel.app/
+
+Vercel에서 GitHub 저장소를 Import하면 됩니다.
+
+- Framework Preset: Other
+- Build Command: 비움
+- Output Directory: 비움 또는 `.`
+- Install Command: 비움
+
+Firebase Authentication의 Authorized domains에 `casecouple.vercel.app`을 추가하세요.
