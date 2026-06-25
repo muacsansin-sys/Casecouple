@@ -175,6 +175,10 @@ function showAuthMessage(message) {
   document.getElementById("authNote").textContent = message;
 }
 
+function currentDomainHint() {
+  return `현재 접속 도메인: ${location.hostname}`;
+}
+
 function renderI18n() {
   document.querySelectorAll("[data-i18n]").forEach((node) => { node.textContent = t(node.dataset.i18n); });
   document.querySelectorAll(".language-toggle button").forEach((button) => button.classList.toggle("active", button.dataset.lang === state.lang));
@@ -257,7 +261,7 @@ async function initFirebase() {
     const db = storeModule.getFirestore(app);
     state.firebase = { auth, ...authModule, db, ...storeModule };
     state.firebase.onAuthStateChanged(auth, handleAuthState);
-    showAuthMessage("Firebase 연결 완료. Google 로그인을 눌러주세요.");
+    showAuthMessage(`Firebase 연결 완료. Google 로그인을 눌러주세요. ${currentDomainHint()}`);
     const redirectResult = await state.firebase.getRedirectResult(auth);
     if (redirectResult?.user) {
       await handleAuthState(redirectResult.user);
@@ -269,7 +273,7 @@ async function initFirebase() {
   } catch (error) {
     state.firebaseReady = false;
     console.warn("Firebase local fallback:", error);
-    showAuthMessage(`Firebase 초기화 오류: ${error.code || error.message}`);
+    showAuthMessage(`Firebase 초기화 오류: ${error.code || error.message}. ${currentDomainHint()}`);
     setGate(true, false);
   }
 }
@@ -286,7 +290,7 @@ async function signInWithGoogle() {
     await state.firebase.signInWithRedirect(state.firebase.auth, provider);
   } catch (error) {
     console.error(error);
-    showAuthMessage(`로그인 오류: ${error.code || error.message}`);
+    showAuthMessage(`로그인 오류: ${error.code || error.message}. ${currentDomainHint()}`);
     setGate(true, false);
   }
 }
