@@ -10,7 +10,7 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <button class="icon-button" type="button" aria-label="profile">LB</button>
+      <button class="icon-button" id="profileButton" type="button" aria-label="profile">LB</button>
       <div class="brand"><strong>Love Base</strong><span data-i18n="tagline">Seoul to Bangkok</span></div>
       <div class="language-toggle" aria-label="language"><button class="active" data-lang="ko" type="button">KO</button><button data-lang="th" type="button">TH</button></div>
     </header>
@@ -39,13 +39,47 @@
       <section class="view" id="view-game"><div class="page-head"><h1 data-i18n="gamePage">게임</h1><p data-i18n="gamePageCopy">매일 하나씩 열리는 커플 미니게임</p></div><article class="card play-card" id="gamePlayCard"></article><div class="mini-game-list" id="miniGameList"></div></section>
       <section class="view" id="view-words"><div class="page-head"><h1 data-i18n="wordPage">단어</h1><p data-i18n="wordPageCopy">서로의 언어로 마음을 전하는 연습</p></div><article class="card word-practice"><span class="eyebrow" id="wordPracticeTheme">-</span><div id="wordPracticeList"></div><label class="message-box"><span data-i18n="wordMessage">오늘 배운 말로 한마디</span><textarea id="wordMessageInput" rows="3" placeholder="คิดถึงนะ"></textarea></label><button class="primary-button full" id="saveWordsButton" type="button" data-i18n="saveWords">단어 완료</button></article></section>
       <section class="view" id="view-records"><div class="page-head"><h1 data-i18n="recordsPage">기록</h1><p data-i18n="recordsPageCopy">사진, 메모, 기념일을 한 곳에</p></div><article class="card setup-card"><span class="eyebrow" data-i18n="coupleSettings">커플 설정</span><label><span data-i18n="startDate">사귄 날짜</span><input id="startDateInput" type="date"></label><button class="secondary-button full" id="saveStartDateButton" type="button" data-i18n="save">저장</button></article><div class="anniversary-list" id="anniversaryList"></div></section>
-      <section class="view" id="view-us"><div class="page-head"><h1 data-i18n="usPage">우리</h1><p data-i18n="usPageCopy">둘만의 기본 정보와 Firebase 연결 준비</p></div><article class="card setup-card"><span class="eyebrow">Firebase</span><p data-i18n="firebaseCopy">firebase-config.js에 프로젝트 설정값을 넣으면 연결됩니다.</p><pre><code>window.LOVEBASE_FIREBASE_CONFIG = { ... };</code></pre></article><article class="card setup-card"><span class="eyebrow" data-i18n="designNote">디자인 노트</span><p data-i18n="designCopy">큰 터치 영역, 짧은 문구, 은은한 빛으로 매일 열고 싶은 느낌을 만들었어요.</p></article></section>
+      <section class="view" id="view-us"><div class="page-head"><h1 data-i18n="usPage">우리</h1><p data-i18n="usPageCopy">둘만의 기본 정보와 Firebase 연결 준비</p></div><article class="card setup-card"><span class="eyebrow">Firebase</span><p data-i18n="firebaseCopy">firebase-config.js에 프로젝트 설정값을 넣으면 연결됩니다.</p><pre><code>window.LOVEBASE_FIREBASE_CONFIG = { ... };</code></pre></article><article class="card setup-card"><span class="eyebrow" data-i18n="designNote">디자인 노트</span><p data-i18n="designCopy">큰 터치 영역, 짧은 문구, 은은한 빛으로 매일 열고 싶은 느낌을 만들었어요.</p></article><article class="card setup-card"><span class="eyebrow">Account</span><button class="secondary-button full" id="signOutButton" type="button">로그아웃</button><button class="danger-button full" id="leaveCoupleButton" type="button">커플 연결 해제</button></article></section>
     </main>
 
     <nav class="bottom-nav" aria-label="main navigation"><button class="nav-item active" data-tab="today" type="button"><span>⌂</span><small data-i18n="navToday">오늘</small></button><button class="nav-item" data-tab="game" type="button"><span>♡</span><small data-i18n="navGame">게임</small></button><button class="nav-item" data-tab="words" type="button"><span>Aa</span><small data-i18n="navWords">단어</small></button><button class="nav-item" data-tab="records" type="button"><span>□</span><small data-i18n="navRecords">기록</small></button><button class="nav-item" data-tab="us" type="button"><span>◦</span><small data-i18n="navUs">우리</small></button></nav>
   </div>
 
+  <section class="auth-gate" id="authGate" aria-live="polite">
+    <div class="auth-card">
+      <div class="auth-mark">LB</div>
+      <span class="eyebrow">Love Base</span>
+      <h1 id="authTitle">Google 계정으로 시작하기</h1>
+      <p id="authCopy">커플 기록을 안전하게 저장하려면 Google 로그인이 필요해요.</p>
+      <button class="google-button" id="googleLoginButton" type="button">
+        <span>G</span>
+        <strong id="googleLoginText">Google로 로그인</strong>
+      </button>
+      <p class="auth-note" id="authNote">로그인 후 오늘의 게임과 단어 기록이 Firebase에 저장됩니다.</p>
+    </div>
+  </section>
+
+  <section class="auth-gate" id="coupleGate" aria-live="polite">
+    <div class="auth-card">
+      <div class="auth-mark">♡</div>
+      <span class="eyebrow">Couple Space</span>
+      <h1 id="coupleGateTitle">커플 공간 만들기</h1>
+      <p id="coupleGateCopy">초대 링크를 보내고 상대가 Google 로그인으로 수락하면 둘만의 기록이 열려요.</p>
+      <button class="google-button" id="createInviteButton" type="button">
+        <span>+</span>
+        <strong id="createInviteText">초대 링크 만들기</strong>
+      </button>
+      <label class="invite-box">
+        <span id="inviteLabel">초대 링크</span>
+        <input id="inviteLinkInput" type="text" readonly>
+      </label>
+      <button class="secondary-button full" id="copyInviteButton" type="button">링크 복사</button>
+      <p class="auth-note" id="coupleGateNote">연결 전에는 기록이 저장되지 않아요.</p>
+    </div>
+  </section>
+
   <script src="./firebase-config.example.js"></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>
+
