@@ -1,6 +1,6 @@
 const translations = {
   ko: {
-    tagline: "Seoul to Bangkok",
+    tagline: "Korea to Thailand",
     streakDays: "일 연속",
     daysTogether: "일째",
     heroCopy: "오늘도 둘의 기록이 이어지는 중",
@@ -42,7 +42,7 @@ const translations = {
     completedToast: "오늘 기록이 저장됐어요."
   },
   th: {
-    tagline: "โซลถึงกรุงเทพ",
+    tagline: "เกาหลีถึงไทย",
     streakDays: "วันต่อเนื่อง",
     daysTogether: "วันแล้ว",
     heroCopy: "วันนี้เรายังบันทึกเรื่องของเราอยู่",
@@ -231,6 +231,7 @@ function renderAnniversaries() {
 }
 function renderCoupleGate() {
   const input = document.getElementById("inviteLinkInput");
+  document.getElementById("inviteStartDateInput").value = state.startDate;
   input.value = state.coupleId ? inviteUrl(state.coupleId) : "";
   document.getElementById("createInviteText").textContent = state.coupleId ? "초대 링크 다시 만들기" : "초대 링크 만들기";
   document.getElementById("coupleGateCopy").textContent = state.coupleId ? "이 링크를 상대에게 보내면 Google 로그인 후 둘만의 공간이 연결돼요." : "초대 링크를 보내고 상대가 수락하면 둘만의 기록이 열려요.";
@@ -328,11 +329,14 @@ async function loadCouple(coupleId) {
 
 async function createInvite() {
   const { db, collection, addDoc, doc, setDoc, serverTimestamp } = state.firebase;
+  const inviteStartDate = document.getElementById("inviteStartDateInput").value || state.startDate;
+  state.startDate = inviteStartDate;
+  localStorage.setItem("lovebase.startDate", inviteStartDate);
   const coupleRef = await addDoc(collection(db, "couples"), {
     ownerUid: state.user.uid,
     memberIds: [state.user.uid],
     members: { [state.user.uid]: { ...memberProfile(state.user), role: "owner" } },
-    startDate: state.startDate,
+    startDate: inviteStartDate,
     status: "pending",
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp()
@@ -416,6 +420,7 @@ function switchTab(tab) {
 
 async function boot() {
   document.getElementById("startDateInput").value = state.startDate;
+  document.getElementById("inviteStartDateInput").value = state.startDate;
   document.querySelectorAll(".language-toggle button").forEach((button) => button.addEventListener("click", () => {
     state.lang = button.dataset.lang;
     localStorage.setItem("lovebase.lang", state.lang);

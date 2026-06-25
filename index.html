@@ -1,17 +1,17 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#fff1f6">
-  <title>Love Base</title>
+  <title>KOTH-LOVE</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <button class="icon-button" id="profileButton" type="button" aria-label="profile">LB</button>
-      <div class="brand"><strong>Love Base</strong><span data-i18n="tagline">Seoul to Bangkok</span></div>
+      <div class="brand"><strong>KOTH-LOVE</strong><span data-i18n="tagline">Korea to Thailand</span></div>
       <div class="language-toggle" aria-label="language"><button class="active" data-lang="ko" type="button">KO</button><button data-lang="th" type="button">TH</button></div>
     </header>
 
@@ -48,7 +48,7 @@
   <section class="auth-gate active" id="authGate" aria-live="polite">
     <div class="auth-card">
       <div class="auth-mark">LB</div>
-      <span class="eyebrow">Love Base</span>
+      <span class="eyebrow">KOTH-LOVE</span>
       <h1 id="authTitle">Google 계정으로 시작하기</h1>
       <p id="authCopy">커플 기록을 안전하게 저장하려면 Google 로그인이 필요해요.</p>
       <button class="google-button" id="googleLoginButton" type="button">
@@ -65,6 +65,10 @@
       <span class="eyebrow">Couple Space</span>
       <h1 id="coupleGateTitle">커플 공간 만들기</h1>
       <p id="coupleGateCopy">초대 링크를 보내고 상대가 Google 로그인으로 수락하면 둘만의 기록이 열려요.</p>
+      <label class="invite-box">
+        <span>사귀기로 시작한 날</span>
+        <input id="inviteStartDateInput" type="date">
+      </label>
       <button class="google-button" id="createInviteButton" type="button">
         <span>+</span>
         <strong id="createInviteText">초대 링크 만들기</strong>
